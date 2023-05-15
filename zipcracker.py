@@ -18,20 +18,3 @@ with open(password_list_file, 'r') as file:
         password = line.strip()
         if open_password_protected_zip(file_path, password):
             break
-""""
-def open_password_protected_zip(loca, word):
-    try:
-        with pyzipper.AESZipFile(loca, 'r', compression=pyzipper.ZIP_LZMA) as zip_ref:
-            for line in word:
-                for words in line.split():
-                    zip_ref.extractall(pwd=words.encode())
-                    print("pass is " + words.decode())
-                    print("Zip file extracted successfully.")
-    except RuntimeError as e:
-        print("Failed to extract zip file:", e)
-
-location = input("your file location: ")
-wordlist = input("your wordlist: ")
-
-open_password_protected_zip(location, wordlist)
-"""
