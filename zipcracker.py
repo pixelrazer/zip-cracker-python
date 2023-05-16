@@ -1,51 +1,57 @@
 import pyzipper
-import time
-import os
+import zlib
+from tqdm import tqdm
 
-def open_password_protected_zip(file_path, password, extraction_directory):
+def open_password_protected_zip(file_path, password):
     try:
-        with pyzipper.AESZipFile(file_path, 'r', compression=pyzipper.ZIP_LZMA) as zip_ref:
-            zip_ref.extractall(path=extraction_directory, pwd=password.encode())
-        print(f"\nPassword is {password}")
-        return True
-    except RuntimeError as e:
-        print(f"RuntimeError: {str(e)}")
+        with pyzipper.AESZipFile(file_path, 'r') as zip_ref:
+            # Attempt to decrypt the zip file using the provided password
+            zip_ref.setpassword(password.encode())
+            # Check if the zip file can be read successfully
+            try:
+                zip_ref.read(zip_ref.infolist()[0])
+                # If no exception is raised, the password is correct
+                return True
+            except zlib.error:
+                # If zlib.error is raised, the zip file has invalid stored block lengths
+                return False
+    except (pyzipper.BadZipFile, RuntimeError, pyzipper.LargeZipFile, ValueError, NotImplementedError, RuntimeError):
+        # If an exception is raised, the password is incorrect
         return False
 
-def show_animation():
-    animation = "|/-\\"
-    idx = 0
-    while True:
-        print(f"\rCracking password... {animation[idx]}", end="")
-        idx = (idx + 1) % len(animation)
-        time.sleep(0.1)
-
-banner = '''
+banner = '\033[91m' + '''
 .___________. __  .___________.    ___      .__   __. 
 |           ||  | |           |   /   \     |  \ |  | 
 `---|  |----`|  | `---|  |----`  /  ^  \    |   \|  | 
     |  |     |  |     |  |      /  /_\  \   |  . `  | 
     |  |     |  |     |  |     /  _____  \  |  |\   | 
     |__|     |__|     |__|    /__/     \__\ |__| \__| 
-'''
+              By: PixelRazer & Trace
+''' + '\033[0m'
 
 print(banner)
 
 file_path = input("Enter the location of the zip file: ")
 password_list_file = input("Enter the location of the file containing the list of passwords: ")
-extraction_directory = input("Enter the directory to extract the files to: ")
 
-with open(password_list_file, 'r') as file:
-    for line in file:
-        password = line.strip()
-        print(f"Trying password: {password}")
-        os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console screen
-        print(banner)
-        show_animation()
-        success = open_password_protected_zip(file_path, password, extraction_directory)
-        print(f"Password cracking attempt for {password}: {'Success' if success else 'Failed'}")
-        if success:
-            print("\nPassword cracked successfully.")
+with open(password_list_file, 'r', encoding='latin-1') as file:
+    passwords = file.readlines()
+    passwords = [password.strip() for password in passwords]
+
+print(f"\nCracking password...\n")
+
+success = False
+
+# Use tqdm to create a progress bar
+with tqdm(total=len(passwords), ncols=80) as pbar:
+    for password in passwords:
+        pbar.set_description(f"Trying password: {password}")
+        if open_password_protected_zip(file_path, password):
+            success = True
+            pbar.close()
+            print(f"\nPassword cracked successfully. Password is: {password}")
             break
-    else:
-        print("\nUnable to crack the password. Password not found.")
+        pbar.update(1)
+
+if not success:
+    print("\nUnable to crack the password. Password not found.")
