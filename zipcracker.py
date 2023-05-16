@@ -1,5 +1,4 @@
 import pyzipper
-import time
 import os
 
 def open_password_protected_zip(file_path, password, extraction_directory):
@@ -12,14 +11,6 @@ def open_password_protected_zip(file_path, password, extraction_directory):
         print(f"RuntimeError: {str(e)}")
         return False
 
-def show_animation():
-    animation = "|/-\\"
-    idx = 0
-    while True:
-        print(f"\rCracking password... {animation[idx]}", end="")
-        idx = (idx + 1) % len(animation)
-        time.sleep(0.1)
-
 banner = '''
 .___________. __  .___________.    ___      .__   __. 
 |           ||  | |           |   /   \     |  \ |  | 
@@ -27,6 +18,7 @@ banner = '''
     |  |     |  |     |  |      /  /_\  \   |  . `  | 
     |  |     |  |     |  |     /  _____  \  |  |\   | 
     |__|     |__|     |__|    /__/     \__\ |__| \__| 
+                   Pixel & Trace
 '''
 
 print(banner)
@@ -41,7 +33,6 @@ with open(password_list_file, 'r') as file:
         print(f"Trying password: {password}")
         os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console screen
         print(banner)
-        show_animation()
         success = open_password_protected_zip(file_path, password, extraction_directory)
         print(f"Password cracking attempt for {password}: {'Success' if success else 'Failed'}")
         if success:
