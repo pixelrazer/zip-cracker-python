@@ -11,6 +11,8 @@ def open_password_protected_zip(file_path, password):
             try:
                 zip_ref.read(zip_ref.infolist()[0])
                 # If no exception is raised, the password is correct
+                zip_ref.extractall(path=path_extract)
+                # If the passowrd is correct it will extract the contents of the zipfile
                 return True
             except zlib.error:
                 # If zlib.error is raised, the zip file has invalid stored block lengths
@@ -33,6 +35,7 @@ print(banner)
 
 file_path = input("Enter the location of the zip file: ")
 password_list_file = input("Enter the location of the file containing the list of passwords: ")
+path_extract = input("directory on where you want to extract the contents of the files to ")
 
 with open(password_list_file, 'r', encoding='latin-1') as file:
     passwords = file.readlines()
