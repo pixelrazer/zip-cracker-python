@@ -1,5 +1,8 @@
+# imports
 import pyzipper
 import zlib
+import time
+import threading
 
 def open_password_protected_zip(file_path, password):
     try:
@@ -16,6 +19,17 @@ def open_password_protected_zip(file_path, password):
         # if an exception is raised, the password is incorrect or the zip file is invalid
         return False
 
+def crack_password(passwords):
+    success = False
+    for password in passwords:
+        if open_password_protected_zip(file_path, password):
+            success = True
+            print(f"\nPassword cracked successfully. Password is: {password}")
+            break
+
+    if not success:
+        print("\nUnable to crack the password. Password not found.")
+
 banner = '\033[91m' + '''
 .___________. __  .___________.    ___      .__   __. 
 |           ||  | |           |   /   \     |  \ |  | 
@@ -24,6 +38,7 @@ banner = '\033[91m' + '''
     |  |     |  |     |  |     /  _____  \  |  |\   | 
     |__|     |__|     |__|    /__/     \__\ |__| \__| 
               By: PixelRazer & Trace
+    Contributers: JustinsRepo
 ''' + '\033[0m'
 
 print(banner)
@@ -37,13 +52,17 @@ with open(password_list_file, 'r', encoding='latin-1') as file:
 
 print(f"\nCracking password...\n")
 
-success = False
+#splitting password threads
+num_threads = 4
+password_chunks = [passwords[i:i+num_threads] for i in range(0, len(passwords), num_threads)]
 
-for password in passwords:
-    if open_password_protected_zip(file_path, password):
-        success = True
-        print(f"\nPassword cracked successfully. Password is: {password}")
-        break
+#thread creation
+threads = []
+for chunk in password_chunks:
+    thread = threading.Thread(target=crack_password, args=(chunk,))
+    thread.start()
+    threads.append(thread)
 
-if not success:
-    print("\nUnable to crack the password. Password not found.")
+#thread finish
+for thread in threads:
+    thread.join()
