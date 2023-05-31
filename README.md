@@ -21,9 +21,9 @@ This Python-based tool is an innovative solution designed to aid in the recovery
   
  ___
 ## Contributors
-+ ![7R4C3](https://github.com/7R4C3)
-+ ![pixelrazer](https://github.com/pixelrazer)
-+ ![JustinsRepo](https://github.com/JustinsRepo)
++ [7R4C3](https://github.com/7R4C3)
++ [pixelrazer](https://github.com/pixelrazer)
++ [JustinsRepo](https://github.com/JustinsRepo)
 
 ## Our Community
 https://discord.gg/a7jxkKEQQv
